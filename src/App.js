@@ -72,7 +72,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Forecast Prediction</h1>
+        <h1>Population Prediction</h1>
         <form onSubmit={handleSubmit} className="form">
           <input
             type="number"
