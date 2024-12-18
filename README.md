@@ -1,70 +1,86 @@
-yarn# Getting Started with Create React App
+# Global Population Density Prediction - MLOps Project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Project Overview
 
-## Available Scripts
+This project focuses on predicting global population density for future years by analyzing historical population data. The system uses a time-series forecasting model called **Prophet** by Meta (formerly Facebook) to predict future population trends and density. This tool is particularly useful for urban planning, resource management, and infrastructure development.
 
-In the project directory, you can run:
+### Key Features:
+- **Prediction of population density**: Forecasts the population density for future years based on historical data.
+- **Real-time prediction**: A REST API powered by AWS Lambda and SageMaker allows real-time prediction for a given year.
+- **User-friendly interface**: A React-based frontend hosted on an EC2 instance allows users to input a year and get predictions.
 
-### `npm start`
+## Dataset
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The dataset used in this project contains the following columns:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+1. **Year**: Integer (ranging from 1951 to 2023).
+2. **Population**: Integer (total population count).
+3. **Yearly Growth %**: Float (annual percentage growth rate).
+4. **Number**: Integer (population increase from the previous year).
+5. **Density (Pop/km²)**: Float (population density in individuals per square kilometer).
 
-### `npm test`
+The dataset consists of **73 records** with no missing values, providing a solid foundation for training the model.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Model
 
-### `npm run build`
+The model used for prediction is **Prophet**, a robust time-series forecasting tool that handles seasonality, holidays, and missing data. Prophet is well-suited for predicting population trends and densities based on historical data.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The process involves:
+- Training the Prophet model on historical population data (1951–2023).
+- Forecasting population values for future years.
+- Predicting population density by combining forecasted population with area size assumptions.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Steps Involved
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Step 1: Data Storage (AWS S3 Bucket)
+- **Purpose**: Store raw data, trained models, and other resources.
+- We used AWS S3 to store historical population data, the trained model from SageMaker, and processed data.
 
-### `npm run eject`
+### Step 2: Set Up SageMaker Endpoint
+- **Purpose**: Train and deploy the Prophet model for real-time inference.
+- We created an Amazon SageMaker Notebook (Jupyter) to:
+  - Load and preprocess the dataset.
+  - Train the Prophet model on historical data.
+  - Deploy the trained model as a SageMaker endpoint for real-time inference.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Step 3: Lambda Function for Data Processing
+- **Purpose**: Process incoming data and interact with SageMaker.
+- We set up an AWS Lambda function that receives requests via API Gateway, processes them, and passes the data to the SageMaker endpoint to retrieve predictions.
+- The Lambda function returns the predicted population and density values.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Step 4: API Gateway
+- **Purpose**: Expose a REST API that interacts with the Lambda function.
+- We configured AWS API Gateway to create a RESTful endpoint, which triggers the Lambda function when a request is made from the frontend (React app).
+  
+### Step 5: Frontend (React on EC2 Instance)
+- **Purpose**: Build an interactive user interface for user input and prediction display.
+- We developed a **React application** to:
+  - Allow users to input a year and request predictions.
+  - Make HTTP requests to the API Gateway to retrieve predictions from the Lambda function.
+- The React app is hosted on an **EC2 instance** with a web server (e.g., Apache or Nginx) serving the frontend.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Deployment
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### AWS Infrastructure
+- **S3 Bucket**: For storing historical data, model artifacts, and processed data.
+- **Amazon SageMaker**: For training and deploying the Prophet model.
+- **AWS Lambda**: For processing user input and interacting with SageMaker.
+- **API Gateway**: For exposing the REST API for user interactions.
+- **EC2 Instance**: For hosting the React frontend application.
 
-## Learn More
+### React Frontend
+The frontend allows users to input a year, and the system will return the predicted population density for that year. The frontend communicates with the backend (Lambda function) via the API Gateway.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+#### Screenshot:
+![image](https://github.com/user-attachments/assets/fa84be30-7fa8-4590-8953-f35a275ba363)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+<!-- You can add the path to the image here -->
 
-### Code Splitting
+## Installation
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### React Frontend
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/population-density-prediction.git
+   cd population-density-prediction
