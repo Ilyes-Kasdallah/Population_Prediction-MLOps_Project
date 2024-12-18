@@ -83,4 +83,4 @@ The frontend allows users to input a year, and the system will return the predic
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/population-density-prediction.git
-   cd population-density-prediction
+   cd Population_Prediction-MLOps_Project
